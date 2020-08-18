@@ -220,24 +220,26 @@ Moodle Migration involves following steps,
             cd /home/azureadmin/storage/configuration/
             sudo cp <dns>.conf  /etc/nginx/sites-enabled/
         ``` 
-    - For changing the log paths go to the nginx config file (/etc/nginx/sites-enabled/dns.conf) and replace the site log path as below  
-```sh
-    # Log to syslog 
-    error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
-    access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
-``` 
-           
-        - User can get the site logs at /var/log/nginx/ path. 
-        - Change the log paths and mention the example
-        - DNS name and certs and its path 
-        - Next copy the php config file from blob storage to the php config folder. 
-```sh
-    sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup
-    sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/
-    sudo systemctl restart nginx
-    sudo systemctl restart php(phpVersion)-fpm  
-    ex: sudo systemctl restart php7.4-fpm 
-``` 
-        
+    - For changing the log paths go to the nginx config file (/etc/nginx/sites-enabled/dns.conf) and replace the site log path as below
+    ```
+        # Log to syslog 
+        error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
+        access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
+    ```
+    
+    - User can get the site logs at /var/log/nginx/ path. 
+    - Change the log paths and mention the example
+    - DNS name and certs and its path 
+    - Next copy the php config file from blob storage to the php config folder.
+    ```
+        sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup
+        sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/
+        sudo systemctl restart nginx
+        sudo systemctl restart php(phpVersion)-fpm  
+        ex: sudo systemctl restart php7.4-fpm 
+    ``` 
+    
     - Any other extensions that is needed for the php that is not installed as part of the ARM template installion must be done manually 
     - Hit the load balancer DNS name to get the Moodle page. 
+
+    
