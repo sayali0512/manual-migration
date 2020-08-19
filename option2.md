@@ -4,7 +4,7 @@
  - The Azure infrastructure is the basic skeleton of the resources which will host the Moodle application. 
  - For installing the infrastructure for Moodle navigate to the [azure portal](portal.azure.com) 
  - In the home section go the resource group section and add a new a resource group for the Moodle infrastructure [click here](https://ms.portal.azure.com/#blade/HubsExtension/BrowseResourceGroups) 
-  ![createRG]()
+  ![createRG](images/resourcegroup.png)
  - Select the subscription as per the choice, give the resource group name and select the region of deployment
  - Add the tag for more specification 
  - Tags are name-value pairs that are used to organize resources in Azure Portal [click here](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources) 
@@ -14,14 +14,14 @@
 - ##### Below are the prerequisites resource to host the Moodle application 
 - **Network Resources**
     * **Standard Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/tutorial-load-balancer#:~:text=An%20Azure%20load%20balancer%20is,traffic%20to%20an%20operational%20VM.) 
-    *  ![loadbalancer]()
+    *  ![loadbalancer](images/lb1.png) ![loadbalancer](images/lb2.png)
     *  In the Basics tab, Select the same subscription, same resource group created in above step, give the instance details such as name for load balancer, and region same as selected for resource group 
     *  Select the type as public and sku as standard. 
     *  Create a new IP address and give the give the IP address name.
     *  In the tag section, if required give the tag value. 
     *  After giving the mandatory values click on review and create. [Click here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/tutorial-load-balancer#:~:text=An%20Azure%20load%20balancer%20is,traffic%20to%20an%20operational%20VM.) 
     - **Virtual Network** - An Azure Virtual Network is a representation of your own network in the cloud. It is a logical isolation of the Azure cloud dedicated to your subscription. When you create a VNet, your services and VMs within your VNet can communicate directly and securely with each other in the cloud. More information on Virtual Network [click here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview). 
-    - ![Virtual Network SS]()
+    - ![Virtual Network SS](images/vn1.png) ![Virtual Network SS](images/vn2.png)  ![Virtual Network SS](images/vn4.png)
     - From the Azure portal menu, select Create a resource. From the Azure Marketplace, select Networking > Virtual network.
     - In Create virtual network, enter or select this information: 
         - Subscription: Select the same subscription. 
@@ -30,7 +30,7 @@
         - Location: Select East US same as resource group 
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
-    - ![subnet SS]()
+    - ![subnet SS](images/vn3.png)
     - Select Add, then select Review + create. Leave the rest as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
     
@@ -41,7 +41,7 @@
         - Replication: Locally-redundant storage (LRS), Geo redundant storage, etc.
         - Performance: Standard or Premium
         - Size(sku) 
-    - ![create storage SS]()
+    - ![create storage SS](images/storageaccount.png)
     - On the Azure portal menu, select All services. In the list of resources, type Storage Accounts. As you begin typing, the list filters based on your input. Select Storage Accounts.
     - On the Storage Accounts window that appears, choose Add. 
     - Select the same subscription in which to create the storage account. 
@@ -98,316 +98,197 @@
     -  ![connectionSecurity SS]()
     -  You can Add My IP, or configure firewall rules here. Remember to click Save after you have created the rules. You can now connect to the server using mysql command-line tool or MySQL Workbench GUI tool. 
 -  **Get connection information:**
-
-In Azure portal, click All resources from the left-hand menu, type the name, and search for your Azure Database for MySQL server. Select the server name to view the details. 
-
-From the Overview page, note down Server Name and Server admin login name. You may click the copy button next to each field to copy to the clipboard. 4-2 server properties 
-
-In this example, the server name is mydemoserver.mysql.database.azure.com, and the server admin login is myadmin@mydemoserver. 
-
-                 
-
-Virtual Machine 
-
-A virtual machine is a computer file, typically called an image, which behaves like an actual compute Click here 
-
-Before creating Virtual machine create an SSH key pair 
-
-If you already have an SSH key pair, you can skip this step. 
-
-Go to the PuTTY installation folder (the default location is C:\Program Files\PuTTY) and run: puttygen.exe 
-
-In the PuTTY Key Generator window, set Type of key to generate to RSA, and set Number of bits in a generated key to 2048. 
-
- 
-
-Select Generate. 
-
-To generate a key, in the Key box, move the pointer randomly. 
-
-When the key generation has finished, select Save public key, and then select Save private key to save your keys to files. 
-
- 
-
-The public and private key is generated 
-
- 
-
-Create a VM with ubuntu 16.04 / 18.04 operating system with SSH public key 
-
-Select the same subscription and resource group and give name for virtual machine. 
-
-Give the same region group. 
-
-Keep the availability options as default. 
-
-Image is the size of the virtual machine. Browse the image and select it 
-
-Select Authentication type SSH, give the username give the SSH key generated in previous step. 
-
-Select the disk size. 
-
-Select the inbound rule for SSH as 22 and HTTP as 80 
-
- 
-
- 
-
-Click next on Disk section 
-
-Select the OS disk type. There are 3 choices Standard SSD, Premium SSD, Standard HDD 
-
-Keep the other parameters as default 
-
- 
-
-Click next on networking and select the virtual network created in above step and the public IP and keep the above parameters as default. 
-
-Click on next for management and keep the parameters as default. 
-
- 
-
-And keeping the other parameters as default Click on review and create. 
-
-Login into this controller machine using any of the free open-source terminal emulator or serial console tools 
-
-Copy the public IP of controller VM and paste as host name and expand SSH in navigation panel and click on Auth and browse the same SSH key file given while deployment. Click on Open and it will prompt to give the username as azureadmin same as given while deployment that is azureadmin 
-
- 
-
- 
-
-There are 4 files to be copied from blob stoarge to setup moodle application. 
-
-First copy the Moodle folder.  
-
-Download moodle.tar.gz file from the blob storage. 
-
-The path to download will be /home/azureadmin so navigate to this path  
-
-cd /home/azureadmin 
-
-azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-
-After downloading the moodle.tar.gz file will be present  
-
-Extract this moodle.tar.gz file  
-
-Command: tar -zxvf yourfile.tar.gz (here the file name will be moodle.tar.gz) 
-
-Then copy and this moodle folder to the moodle installation path. 
-
-Go as a root user and copy the moodle folder  
-
-cp /home/azureadmin/moodle  
-
- 
-
-Copy the moodledata folder  
-
-Download moodledata.tar.gz file from the blob storage. 
-
-The path to download will be /home/azureadmin so navigate to this path  
-
-cd /home/azureadmin 
-
-azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-
-After downloading the moodledata.tar.gz file will be present  
-
-Extract this moodledata.tar.gz file  
-
-Command: tar -zxvf yourfile.tar.gz (here the file name will be moodledata.tar.gz) 
-
-Then copy this moodledata folder. 
-
-Go as a root user and copy the moodledata folder. 
-
-cp /home/azureadmin/moodledata /moodle/ 
-
- 
-
-Importing the .sql file 
-
-Download the database.tar.gz from the blob storage 
-
-The path to download will be /home/azureadmin so navigate to this path  
-
-cd /home/azureadmin 
-
-azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-
- 
-
-After downloading the database.tar.gz file will be present  
-
-Extract this database.tar.gz file  
-
-Command: tar -zxvf yourfile.tar.gz (here the file name will be database.tar.gz) 
-
-The database folder will be extracted which contains the .sql file 
-
-Go as a root user and navigate to database folder and import the .sql file 
-
-For database import first create a database  
-
-             mysql -h $server_name -u $ server_admin_login_name -p$admin_password -e          "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;" 
-
-Change the permissions 
-
-           mysql -h $ server_name -u $ server_admin_login_name -p${admin_password } -e "GRANT ALL ON ${moodledbname}. * TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';" 
-
-Import the database into it 
-
-                      mysql -h db_server_name -u db_login_name -pdb_pass dbname >/path/to/.sql file 
-
- 
-
-Set 755 and www-data owner:group permissions to Moodle folder 
-
-   sudo chmod 755 /moodle 
-
- sudo chown -R www-data:www-data /moodle 
-
-Set 770 and www-data owner:group permissions to MoodleData folder 
-
-sudo chmod 755 /moodle/moodledata 
-
-sudo chown -R www-data:www-data /moodle/moodledata 
-
-Modify the Moodle configuration 
-
-Download the configuration.tar.gz from the blob storage 
-
-The path to download will be /home/azureadmin so navigate to this path  
-
-cd /home/azureadmin 
-
-azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-
-After downloading the configuration.tar.gz file will be present  
-
-Extract this d configuration.tar.gz file  
-
-Command: tar -zxvf yourfile.tar.gz (here the file name will be configuration.tar.gz) 
-
-The configuration folder will be extracted with nginx and php configuration files 
-
-For changing nginx configuration 
-
-First change the database details in moodle configuration file (/moodle/config.php) 
-
-Go to root user and copy the nginx configuration file 
-
-mkdir  -p /home/azureadmin/backup/ 
-
-sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
-
-cd /home/azureadmin/storage/configuration/ 
-
-sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
-
-Change the log paths and mention the example 
-
-DNS name and certs and its path 
-
-Next copy the php config file from blob storage to the php config folder. 
-
-sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup 
-
-sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/ 
-
-sudo systemctl restart nginx 
-
-sudo systemctl restart php(phpVersion)-fpm  
-
-ex: sudo systemctl restart php7.4-fpm  
-
- 
-
-Scale Set: A virtual machine scale set allows you to deploy and manage a set of auto-scaling virtual machines. You can scale the number of VMs in the scale set manually, or define rules to auto scale based on resource usage like CPU, memory demand, or network traffic. An Azure load balancer then distributes traffic to the VM instances in the scale set. Click here 
-
-Create a scale set in same resource group. 
-
-Prerequisites is the to create a public Standard Load Balancer. 
-
-The name and public IP address created are automatically configured as the load balancer's front end. 
-
-You can deploy a scale set with a Windows Server image or Linux image such as RHEL, CentOS, Ubuntu, or SLES. 
-
-Search Virtual machine scale sets. Select Create on the Virtual machine scale sets page, which will open the Create a virtual machine scale set page. 
-
-In the Basics tab, under Project details, select the subscription and then choose to same resource. 
-
-Type name as the name for your scale set. 
-
-In Region, select the same region. 
-
-Leave the default value of Scale Set VMs for Orchestration mode. 
-
-Enter your desired username, and select which authentication type as SSH and give the same SSH key and username as azureadmin 
-
- 
-
- 
-
-Select the image or browse the image for the scale set 
-
-Select the size for the disk. 
-
-Select the authentication type as SSH and provide the same username as azureadmin and SSH key 
-
-Click Next for the disk tab select the OS disk type as per choice 
-
- 
-
-Click Next for the networking section 
-
- 
-
-Select the same virtual network as selected for virtual machine. 
-
- 
-
-Give the instance count and the scaling policy as manual or custom. 
-
-Select Next and keep the other things as default. 
-
-Click on review and create and the scale set. 
-
- 
-
-Execute the webserver.sh script in the VMSS extension 
-
-Install webserver apache/nginx 
-
-Install php with extensions 
-
-Modify the Moodle, nginx, PHP configuration with on-prem. 
-
-Change the database details in moodle configuration file (/moodle/config.php) 
-
-Download and Copy the nginx config file from blob storage to the nginx config folder. 
-
-Download and Copy the php config file from blob storage to the php config folder. 
-
-Create a local copy of moodle from shared folder 
-
-Set a cron job to copy the shared moodle content to /var/www/html/ folder whenever there is a change in timestamp in shared folder. 
-
-Restart servers 
-
-Restart nginx server 
-
-Restart php-fpm server 
-
-With the above steps Moodle infrastructure is ready 
-
-User now hit the load balancer DNS name to get the migrated moodle web page. 
-
-  
-
- 
- 
+    -  In [Azure portal](https://portal.azure.com/), click All resources from the left-hand menu, type the name, and search for your Azure Database for MySQL server. Select the server name to view the details. 
+    -  From the Overview page, note down Server Name and Server admin login name. You may click the copy button next to each field to copy to the clipboard.
+    -  ![Connection Info ss]()
+    -  In this example, the server name is mydemoserver.mysql.database.azure.com, and the server admin login is myadmin@mydemoserver. 
+-  **Virtual Machine** 
+    -  A virtual machine is a computer file, typically called an image, which behaves like an actual compute [click here](https://azure.microsoft.com/en-in/overview/what-is-a-virtual-machine/). 
+    -  Before creating Virtual machine create an SSH key pair.
+        -  If you already have an SSH key pair, you can skip this step. 
+        -  Go to the PuTTY installation folder (the default location is C:\Program Files\PuTTY) and run: puttygen.exe 
+        -  In the PuTTY Key Generator window, set Type of key to generate to RSA, and set Number of bits in a generated key to 2048. 
+        -  ![putty keygen SS]
+        -  Select Generate.
+        -  To generate a key, in the Key box, move the pointer randomly. 
+        -  When the key generation has finished, select Save public key, and then select Save private key to save your keys to files. 
+        -  ![putty keygen ss 1]()
+        -  The public and private key is generated.
+    -  Create a VM with ubuntu 16.04 / 18.04 operating system with SSH public key 
+    -  Select the same subscription and resource group and give name for virtual machine. 
+    -  Give the same region group. 
+    -  Keep the availability options as default. 
+    -  Image is the size of the virtual machine. Browse the image and select it.
+    -  Select Authentication type SSH, give the username give the SSH key generated in previous step. 
+    -  Select the disk size. 
+    -  Select the inbound rule for SSH as 22 and HTTP as 80.
+    -  ![Create a VM Screenshot]()
+    -  Click next on Disk section.
+    -  Select the OS disk type. There are 3 choices Standard SSD, Premium SSD, Standard HDD 
+    -  Keep the other parameters as default. 
+    -  ![Create a VM Screenshot 2]()
+    -  Click next on networking and select the virtual network created in above step and the public IP and keep the above parameters as default.
+    -  ![Create a VM Screenshot 3]()
+    -  Click on next for management and keep the parameters as default. 
+    -   ![Create a VM Screenshot 4]()
+    -   Keeping the other parameters as default Click on review and create.
+    -   Login into this controller machine using any of the free open-source terminal emulator or serial console tools.
+    -   Copy the public IP of controller VM and paste as host name and expand SSH in navigation panel and click on Auth and browse the same SSH key file given while deployment. Click on Open and it will prompt to give the username as azureadmin same as given while deployment that is azureadmin 
+    -   ![putty ss1]()
+    -   ![putty ss1]()
+    -   ##### Download and execute a moodle script
+    -   Download install_prerequisites.sh script.
+        ```
+            cd /home/azureadmin/
+            wget 
+        ```
+    -   Run the install_prerequisites.sh script
+        ```
+            bash install_prerequisites.sh
+        ```
+    -   Above script will perform following task
+        -   Install web server (nginx/apache)
+        -   Install PHP with its extensions
+        -   Create a moodle shared folder (/moodle)
+    -   Download and run the migrate_moodle.sh script
+        ```
+            cd /home/azureadmin/
+            wget 
+            bash migrate_moodle.sh
+        ```
+    -   Above script will download on-prem content(moodle.tar.gz)  from blob storage to VM
+        ```
+            cd /home/azureadmin 
+            azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+        ```
+    -   Extract the moodle compressed file (moodle.tar.gz) to moodle.
+        ```
+            tar -zxvf yourfile.tar.gz
+         ```
+    -   Copy the Moodledata folder to moodle shared folder (/moodle). 
+        ```
+            sudo -s
+            cd /home/azureadmin/moodle/moodledata /moodle/moodledata
+        ```
+    -   Set the configuration
+    -   Set the Moodle and Moodledata folder permissions.
+    -   Set 755 and www-data owner:group permissions to Moodle folder
+        ```sh
+        sudo chmod 755 /moodle
+        sudo chown -R www-data:www-data /moodle 
+        ```
+    -   Set 770 and www-data owner:group permissions to MoodleData folder
+        ```
+        sudo chmod 755 /moodle/moodledata
+        sudo chown -R www-data:www-data /moodle/moodledata
+        ```
+    -  Importing the .sql file  
+        -   Download the database.tar.gz from the blob storage
+        -   The path to download will be /home/azureadmin so navigate to this path
+        ```
+            cd /home/azureadmin 
+            azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+        ```
+        - After downloading the database.tar.gz file will be present
+        - Extract this database.tar.gz file
+        ```
+            tar -zxvf yourfile.tar.gz
+        ```
+        - The database folder will be extracted which contains the .sql file. 
+        - Go as a root user and navigate to database folder and import the .sql file. - For database import first create a database.
+        ```
+            mysql -h $server_name -u $ server_admin_login_name -p$admin_password -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
+        ```
+    - Change the permissions.
+        ```
+            mysql -h $ server_name -u $ server_admin_login_name -p${admin_password } -e "GRANT ALL ON ${moodledbname}. * TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';" 
+        ```
+    - Import the database into it.
+        ```
+            mysql -h db_server_name -u db_login_name -pdb_pass dbname >/path/to/.sql file 
+        ```
+    - Set 755 and www-data owner:group permissions to Moodle folder.
+        ```
+            sudo chmod 755 /moodle
+            sudo chown -R www-data:www-data /moodle 
+        ```
+    - Set 770 and www-data owner:group permissions to MoodleData folder
+        ```
+            sudo chmod 755 /moodle/moodledata
+            sudo chown -R www-data:www-data /moodle/moodledata 
+        ```
+    - Modify the Moodle configuration 
+    - Download the configuration.tar.gz from the blob storage.
+    - The path to download will be /home/azureadmin
+        ```
+            cd /home/azureadmin 
+            azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+        ```
+    - After downloading the configuration.tar.gz file will be present.
+    - Extract this d configuration.tar.gz file
+        ```
+            tar -zxvf yourfile.tar.gz
+        ```
+    - The configuration folder will be extracted with nginx and php configuration files.
+    - For changing nginx configuration.
+        - First change the database details in moodle configuration file (/moodle/config.php)
+        - Go to root user and copy the nginx configuration file
+        ```
+            mkdir  -p /home/azureadmin/backup/
+            sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
+            cd /home/azureadmin/storage/configuration/
+            sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
+        ```
+        - Change the log paths and mention the example
+        - DNS name and certs and its path.
+    - copy the php config file from blob storage to the php config folder. 
+        ```
+            sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup 
+            sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/ 
+            sudo systemctl restart nginx 
+            sudo systemctl restart php(phpVersion)-fpm  
+            ex: sudo systemctl restart php7.4-fpm  
+        ```
+- **Scale Set:** 
+    - A virtual machine scale set allows you to deploy and manage a set of auto-scaling virtual machines. You can scale the number of VMs in the scale set manually, or define rules to auto scale based on resource usage like CPU, memory demand, or network traffic. An Azure load balancer then distributes traffic to the VM instances in the scale set. [Click here](https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/quick-create-portal) 
+        - Create a scale set in same resource group.
+        - Prerequisites is the to create a public Standard Load Balancer. 
+        - The name and public IP address created are automatically configured as the load balancer's front end. 
+        - You can deploy a scale set with a Windows Server image or Linux image such as RHEL, CentOS, Ubuntu, or SLES. 
+        - Search Virtual machine scale sets. Select Create on the Virtual machine scale sets page, which will open the Create a virtual machine scale set page. 
+        - In the Basics tab, under Project details, select the subscription and then choose to same resource. 
+        - Type name as the name for your scale set. 
+        - In Region, select the same region. 
+        - Leave the default value of Scale Set VMs for Orchestration mode. 
+        - Enter your desired username, and select which authentication type as SSH and give the same SSH key and username as azureadmin.
+        - ![scale set ss 1 &2]()
+        - Select the image or browse the image for the scale set 
+        - Select the size for the disk. 
+        - Select the authentication type as SSH and provide the same username as azureadmin and SSH key 
+        - Click Next for the disk tab select the OS disk type as per choice 
+        - ![scale set ss 3]()
+        - Click Next for the networking section 
+        - ![scaleset ss 4]()
+        - Select the same virtual network as selected for virtual machine. 
+        - ![scaleset ss 5]()
+        - Give the instance count and the scaling policy as manual or custom. 
+        - Select Next and keep the other things as default. 
+        - Click on review and create and the scale set. 
+        - ![scaleser ss 6]()
+        - Execute the webserver.sh script in the VMSS extension 
+        - Install webserver apache/nginx 
+        - Install php with extensions 
+        - Modify the Moodle, nginx, PHP configuration with on-prem. 
+        - Change the database details in moodle configuration file (/moodle/config.php) 
+        - Download and Copy the nginx config file from blob storage to the nginx config folder. 
+        - Download and Copy the php config file from blob storage to the php config folder. 
+        - Create a local copy of moodle from shared folder 
+    - Set a cron job to copy the shared moodle content to /var/www/html/ folder whenever there is a change in timestamp in shared folder. 
+    - Restart servers 
+    - Restart nginx server 
+    - Restart php-fpm server 
+    - With the above steps Moodle infrastructure is ready 
+    - User now hit the load balancer DNS name to get the migrated moodle web page. 
+    
 
  
