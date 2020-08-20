@@ -185,7 +185,7 @@ Moodle Migration involves following steps,
         - Click on review and create for creating a storage account
     - **Configure firewall:**
     -  Azure Databases for MySQL are protected by a firewall. By default, all connections to the server and the databases inside the server are rejected. Before connecting to Azure Database for MySQL for the first time, configure the firewall to add the client machine's public network IP address (or IP address range). 
-    -  Click your newly created  MySQL server, and then click Connection security. 
+    -  Click your newly created  MySQL server, and then click Connection security.
     -  ![connectionSecurity SS](images/connection security.png)
     -  You can Add My IP, or configure firewall rules here.click Save after you have created the rules. You can now connect to the server using mysql command-line tool or MySQL Workbench GUI tool. 
 -  **Get connection information:**
