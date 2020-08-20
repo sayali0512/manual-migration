@@ -83,7 +83,7 @@ Moodle Migration involves following steps,
  * For installing the infrastructure for Moodle navigate to the [azure portal](portal.azure.com) 
  * In the home section go the resource group section and add a new a resource group for the Moodle infrastructure [click here](https://ms.portal.azure.com/#blade/HubsExtension/BrowseResourceGroups) 
   ![createRG](images/resourcegroup.png)
-* Select the default subscription, give the resource group name and select the region for deployment
+* Select the created subscription, give the resource group name and select the region for deployment
 * Note: The subscription and region will be default creating every resources 
 * Add the tag for more specification 
 * Tags are name-value pairs that are used to organize resources in Azure Portal [click here](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources) 
@@ -160,13 +160,15 @@ Moodle Migration involves following steps,
         - NFS and glusterFS will create a container 
         - Azure files will create a file share. 
     - To access the containers and file share etc. navigate to storage account in resource group in the portal. 
-     ![create storage SS](images/storageaccount.png)
+    
+    ![create storage SS](images/storageaccount.png)
 
   
 - **Database Resources** - 
     - Creates an Azure Database for MySQL server. [click here](https://docs.microsoft.com/en-in/azure/mysql/).
     - Azure Database for MySQL is easy to set up, manage and scale. It automates the management and maintenance of your infrastructure and database server, including routine updates,backups and security. Build with the latest community edition of MySQL, including versions 5.6, 5.7 and 8.0.
-    - ![mysql server ss]()
+    
+    ![mysql server ss](images/mysqldb1.png)
     - Select the Create a resource button (+) in the upper left corner of the portal in resource group
     - Select Databases > Azure Database for MySQL. If you cannot find MySQL Server under the Databases category, click See all to show all available database services. You can also type Azure Database for MySQL in the search box to quickly find the service. 
     - Click Azure Database for MySQL tile. Fill out the Azure Database for MySQL form. 
@@ -182,16 +184,15 @@ Moodle Migration involves following steps,
         - Pricing tire: General Purpose, Gen 5, 2 vCores, 5 GB, 7 days, Geographically Redundant. 
         - The compute, storage, and backup configurations for your new server. Select Pricing tier
         - Next, select the General-Purpose tab. Gen 5, 2 vCores, 5 GB, and 7 days are the default values for Compute Generation, vCore, Storage, and Backup Retention Period. You can leave those sliders as is. To enable your server backups in geo-redundant storage, select Geographically Redundant from the Backup Redundancy Options. To save this pricing tier selection, select OK. The next screenshot captures these selections.
-        ![pricingTier SS]()
         - Click on review and create for creating a storage account
     - **Configure firewall:**
     -  Azure Databases for MySQL are protected by a firewall. By default, all connections to the server and the databases inside the server are rejected. Before connecting to Azure Database for MySQL for the first time, configure the firewall to add the client machine's public network IP address (or IP address range). 
     -  Click your newly created  MySQL server, and then click Connection security. 
-    -  ![connectionSecurity SS]()
+    -  ![connectionSecurity SS](images/connection security.png)
     -  You can Add My IP, or configure firewall rules here.click Save after you have created the rules. You can now connect to the server using mysql command-line tool or MySQL Workbench GUI tool. 
 -  **Get connection information:**
     -  From the MySQL server resource page, note down Server Name and Server admin login name. You may click the copy button next to each field to copy to the clipboard.
-    -  ![Connection Info ss]()
+    -  ![Connection Info ss](images/mysql-workbench.png)
     -  For example, the server name is mydemoserver.mysql.database.azure.com, and the server admin login is myadmin@mydemoserver.
     
 -  **Virtual Machine** 
@@ -200,11 +201,13 @@ Moodle Migration involves following steps,
         -  If you already have an SSH key pair, you can skip this step. 
         -  Go to the PuTTY installation folder (the default location is C:\Program Files\PuTTY) and run: puttygen.exe 
         -  In the PuTTY Key Generator window, set Type of key to generate to RSA, and set Number of bits in a generated key to 2048. 
-        -  ![putty keygen SS]
+        
+          ![putty keygen SS](images/puttykeygen.png)
         -  Select Generate.
         -  To generate a key, in the Key box, move the pointer randomly. 
         -  When the key generation has finished, select Save public key, and then select Save private key to save your keys to files. 
-        -  ![putty keygen ss 1]()
+        
+          ![putty keygen ss 1](images/puttykeygen2.png)
         -  The public and private key is generated.
     -  Create a VM with ubuntu 16.04 / 18.04 operating system with SSH public key 
     -  Select the default subscription and same resource group and give name for virtual machine. 
@@ -214,20 +217,25 @@ Moodle Migration involves following steps,
     -  Select Authentication type SSH, give the username give the SSH key generated in previous step. 
     -  Select the disk size. 
     -  Select the inbound rule for SSH as 22 and HTTP as 80.
-    -  ![Create a VM Screenshot]()
+    
+      ![Create a VM Screenshot](images/vm1.png)![Create a VM Screenshot 2](images/vm2.png)![Create a VM Screenshot 3](images/vm3.png)
     -  Click next on Disk section.
     -  Select the OS disk type. There are 3 choices Standard SSD, Premium SSD, Standard HDD 
     -  Keep the other parameters as default. 
-    -  ![Create a VM Screenshot 2]()
+    
+      ![Create a VM Screenshot 2](images/vm4.png)
     -  Click next on networking and select the virtual network created in above step and the public IP and keep the above parameters as default.
-    -  ![Create a VM Screenshot 3]()
+    
+      ![Create a VM Screenshot 3](images/vm5.png)
     -  Click on next for management and keep the parameters as default. 
-    -   ![Create a VM Screenshot 4]()
+    
+      ![Create a VM Screenshot 4](images/vm6.png)
     -   Keeping the other parameters as default Click on review and create.
     -   Login into this controller machine using any of the free open-source terminal emulator or serial console tools.
     -   Copy the public IP of controller VM and paste as host name and expand SSH in navigation panel and click on Auth and browse the same SSH key file given while deployment. Click on Open and it will prompt to give the username as azureadmin same as given while deployment that is azureadmin 
-    -   ![putty ss1]()
-    -   ![putty ss1]()
+    
+       ![putty ss1](images/puttyloginpage.PNG)   ![putty ss1](images/puttykeybrowse.PNG)
+
     -   ##### Download and execute a moodle script
     -   Download install_prerequisites.sh script.
         ```
@@ -375,20 +383,24 @@ Moodle Migration involves following steps,
         - In Region, select the same region. 
         - Leave the default value of Scale Set VMs for Orchestration mode. 
         - Enter your desired username, and select which authentication type as SSH and give the same SSH key and username as azureadmin.
-        - ![scale set ss 1 &2]()
+        
+         ![scale set ss 1](images/vmss1.png)![scale set ss 2](images/vmss2.png)
         - Select the image or browse the image for the scale set 
         - Select the size for the disk. 
         - Select the authentication type as SSH and provide the same username as azureadmin and SSH key 
         - Click Next for the disk tab select the OS disk type as per choice 
-        - ![scale set ss 3]()
+        
+        ![scale set ss 3](images/vmss3.png)
         - Click Next for the networking section 
-        - ![scaleset ss 4]()
+        
+        ![scaleset ss 4](images/vmss4.png)
         - Select the same virtual network as selected for virtual machine. 
-        - ![scaleset ss 5]()
+        
+        ![scaleset ss 5](images/vmss5.png)
         - Give the instance count and the scaling policy as manual or custom. 
         - Select Next and keep the other things as default. 
         - Click on review and create and the scale set. 
-        - ![scaleser ss 6]()
+        
         - Execute the webserver.sh script in the VMSS extension 
         - Install webserver apache/nginx 
         - Install php with extensions 
