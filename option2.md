@@ -112,7 +112,7 @@ Moodle Migration involves following steps,
         - Region: Select default region. 
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
-        ![subnet SS](images/vn3.png)
+![subnet SS](images/vn3.png)
     - Select Add, then select Review + create. Leave the rest parameters as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
     
@@ -166,7 +166,7 @@ Moodle Migration involves following steps,
     - Creates an Azure Database for MySQL server. [click here](https://docs.microsoft.com/en-in/azure/mysql/).
     - Azure Database for MySQL is easy to set up, manage and scale. It automates the management and maintenance of your infrastructure and database server, including routine updates,backups and security. Build with the latest community edition of MySQL, including versions 5.6, 5.7 and 8.0.
     
-    ![mysql server ss](images/mysqldb1.png)
+   - ![mysql server ss](images/mysqldb1.png)
     - Select the Create a resource button (+) in the upper left corner of the portal in resource group
     - Select Databases > Azure Database for MySQL. If you cannot find MySQL Server under the Databases category, click See all to show all available database services. You can also type Azure Database for MySQL in the search box to quickly find the service. 
     - Click Azure Database for MySQL. Fill out the Azure Database for MySQL form. 
@@ -232,7 +232,7 @@ Moodle Migration involves following steps,
     -   Login into this controller machine using any of the free open-source terminal emulator or serial console tools.
     -   Copy the public IP of controller VM and paste as host name and expand SSH in navigation panel and click on Auth and browse the same SSH key file given while deployment. Click on Open and it will prompt to give the username as azureadmin same as given while deployment that is azureadmin 
     
-       ![putty ss1](images/puttyloginpage.PNG)   ![putty ss1](images/puttykeybrowse.PNG)
+     ![putty ss1](images/puttyloginpage.PNG)   ![putty ss1](images/puttykeybrowse.PNG)
 
     -   ##### Download and execute a moodle script
     -   Download install_prerequisites.sh script.
