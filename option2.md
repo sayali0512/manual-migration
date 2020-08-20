@@ -21,14 +21,14 @@ Moodle Migration involves following steps,
 
  Data Export from OnPrem to Azure Cloud
 - User must have Azure subscription to create a blob storage.
-- To add a subscrition [click here](https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade), can select [Pay-As-You-Go](https://azure.microsoft.com/en-in/offers/ms-azr-0003p/).
-- After creating the subscription, create a [Resource Group](https://ms.portal.azure.com/#create/Microsoft.ResourceGroup) to host a blob storage.
-- Create Azure Blob storage in the Azure subscription 
-    - After creating a Resource Group, create a [storage account](https://ms.portal.azure.com/#create/Microsoft.StorageAccount) with AutoKind value as "BlobStorage"
+- Select existing subscriotion or user can add a subscription [click here](https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade), can select [Pay-As-You-Go](https://azure.microsoft.com/en-in/offers/ms-azr-0003p/).
+- After creating the subscription, create a [Resource Group](https://ms.portal.azure.com/#create/Microsoft.ResourceGroup).
+- Create Azure Storage Account in the same Resource Group 
+    - Create a [storage account](https://ms.portal.azure.com/#create/Microsoft.StorageAccount) with AutoKind value as "BlobStorage"
 ![Blob-Storage](images/blobstorage.png)
-    - Povide the storage account name must be in combination of lowercase and numericals, click on create button as shown above.
-    - Blob storage is created, can be used to store the onprem data.
-- Install Azure CLI on onprem to copy the data to blob storage.
+    - Give the storage account name must be in combination of lowercase and numericals, click on create button as shown above.
+    - Storage Account is created, can be used to store the onprem data.
+- Install Azure CLI to copy the onprem data to cloud.
     - Install Azure CLI 
         ```
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -64,9 +64,9 @@ Moodle Migration involves following steps,
     ```
         tar -zcvf storage.tar.gz <source/folder/name>
     ```
-- Copy the onprem backup data file to blob storage by following command.
+- Copy the onprem archive file to blob storage by following command.
     - To copy use AzCopy user should generate SAS Token.
-    - Go to created Storage Account Resource and navigate to Shared access signature in the left pannel.
+    - Go to the created Storage Account Resource and navigate to Shared access signature in the left pannel.
     - Select the Container checkbox and set the start, expiry date of the SAS token. Click on "Generate SAS and Connection String". 
     - copy the SAS token for further use.
         ```
@@ -75,13 +75,7 @@ Moodle Migration involves following steps,
         ```
     - With the above steps onprem data is compressed and exported to Azure blob storage.
     - Import the data from Azure blob storage to VM to migrate.
-- Create Azure Blob storage in the Azure subscription and create below folders, - moodle -      moodledata - configurations - dbbackup
-- Make a tar file of the Moodle folder. Ex: /moodle
-- Make a tar file of the Moodle data folder. Ex: /moodledata
-- Make a tar file of php, nginx & moodle configurations. Ex: config.tar.gz
-- Take the back of the MySQL DB.
-- Use AZCopy to copy above backup files to respective folders in Azure Blob storage.
-- Import data to Azure cloud
+
 ### Option 2: Migrating Moodle without template 
 
  * This option is to create the infrastructure manually in azure and migrate Moodle on it. 
