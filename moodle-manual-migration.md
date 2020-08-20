@@ -126,11 +126,13 @@ Moodle Migration involves following steps,
     - Click on Open and it will prompt to give the username. Give it as azureadmin as it is hard coded in template
     ![puttyloginpage](https://github.com/sayali0512/manual-migration/blob/master/images/puttyloginpage.PNG)
     ![puttykey](https://github.com/sayali0512/manual-migration/blob/master/images/puttykeybrowse.PNG)
-* After login, download the tar files for configuration and application dataTfrom azure blob storage. 
+* After the login, run the following set of commands to migrate 
+    - Download the onprem compressed data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location. 
     - Replace the moodle folder  
         - Download moodle.tar.gz file from the blob storage. The path to download will be /home/azureadmin. Navigate to this path 
-        - cd /home/azureadmin 
+        
             ```
+                cd /home/azureadmin 
                 azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
             ```
         - After downloading the moodle.tar.gz ,extract moodle.tar.gz file  
@@ -200,44 +202,43 @@ Moodle Migration involves following steps,
         ``` 
         - Modify the Moodle configuration 
             - Download the configuration.tar.gz from the blob storage 
-        - The path to download will be /home/azureadmin so navigate to this path  
-            ```
-                cd /home/azureadmin
-                azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder'
-            ``` 
-        - After downloading the configuration.tar.gz file ,extract the configuration.tar.gz file
-            ```
-                tar -zxvf yourfile.tar.gz
-            ``` 
-    - The configuration folder will be extracted with nginx and php configuration files 
-    - For changing nginx configuration 
-    - First change the database details in moodle configuration file (/moodle/config.php) 
-    - As a root user copy the nginx configuration file to the nginx folder (/etc/nginx/sites-enabled)
-    
-        ```
-            mkdir  -p /home/azureadmin/backup/ 
-            sudo mv /etc/nginx/sites-enabled/<dns>.conf /home/azureadmin/backup/ 
-            cd /home/azureadmin/storage/configuration/
-            sudo cp <dns>.conf  /etc/nginx/sites-enabled/
-        ``` 
+            - The path to download will be /home/azureadmin so navigate to this path  
+                ```
+                    cd /home/azureadmin
+                    azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder'
+                ``` 
+            - After downloading the configuration.tar.gz file ,extract the configuration.tar.gz file
+                ```
+                    tar -zxvf yourfile.tar.gz
+                ``` 
+            - The configuration folder will be extracted with nginx and php configuration files 
+            - For changing nginx configuration 
+            - First change the database details in moodle configuration file (/moodle/config.php) 
+            - As a root user copy the nginx configuration file to the nginx folder (/etc/nginx/sites-enabled)
+
+                ```
+                    mkdir  -p /home/azureadmin/backup/ 
+                    sudo mv /etc/nginx/sites-enabled/<dns>.conf /home/azureadmin/backup/ 
+                    cd /home/azureadmin/storage/configuration/
+                    sudo cp <dns>.conf  /etc/nginx/sites-enabled/
+                ``` 
     - For changing the log paths go to the nginx config file (/etc/nginx/sites-enabled/dns.conf) and replace the site log path as below
-    ```
-        # Log to syslog 
-        error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
-        access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
-    ```
+        ```
+            # Log to syslog 
+            error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
+            access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
+        ```
     
-    - User can get the site logs at /var/log/nginx/ path. 
-    - Change the log paths and mention the example
+        - User can get the site logs at /var/log/nginx/ path. 
     - DNS name and certs and its path 
     - Next copy the php config file from blob storage to the php config folder.
-    ```
-        sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup
-        sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/
-        sudo systemctl restart nginx
-        sudo systemctl restart php(phpVersion)-fpm  
-        ex: sudo systemctl restart php7.4-fpm 
-    ``` 
+        ```
+            sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup
+            sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/
+            sudo systemctl restart nginx
+            sudo systemctl restart php(phpVersion)-fpm  
+            ex: sudo systemctl restart php7.4-fpm 
+        ``` 
     
     - Any other extensions that is needed for the php that is not installed as part of the ARM template installion must be done manually 
     - Hit the load balancer DNS name to get the Moodle page. 
