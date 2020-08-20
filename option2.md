@@ -16,16 +16,16 @@
 - **Network Resources**
     * **Standard Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-standard-internal-portal) 
     *  ![loadbalancer](images/lb1.png) ![loadbalancer](images/lb2.png)
-    *  In the Basics tab, Select the default subscription, same resource created in above step, give the instance details such as name for load balancer, and default region. 
+    *  In the Basics tab, Select the default subscription and same resource created in above step, give the instance details such as name for load balancer, and default region. 
     *  Select the type as public and sku as standard. 
-    *  A public load balancer can provide outbound connections for virtual machines (VMs) inside your virtual network. These connections are accomplished by translating their private IP addresses to public IP addresses. Public Load Balancers are used to load balance internet traffic to your VMs.
-    *  Standard tier can scale out to 1000 instances and Standard tier can scale out to 1000 instances 
-    *  For Public IP address section ,Create a new IP address and give the give the IP address name and keep other parameters as default.
+       -  A public load balancer can provide outbound connections for virtual machines (VMs) inside your virtual network. These connections are accomplished by translating their private IP addresses to public IP addresses. Public Load Balancers are used to load balance internet traffic to your VMs.
+       - Standard tier can scale out to 1000 instances and Standard tier can scale out to 1000 instances 
+    *  For Public IP address section ,Create a new IP address and give the IP address name and keep other parameters as default.
     *  Click next to tag section, if required give the tag value for more clarification. 
     *  After giving the mandatory values click on review and create. [Click here](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-overview) 
 
     - **Virtual Network** - An Azure Virtual Network is a representation of your own network in the cloud. It is a logical isolation of the Azure cloud dedicated to your subscription. When you create a VNet, your services and VMs within your VNet can communicate directly and securely with each other in the cloud. More information on Virtual Network [click here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview). 
-    - ![Virtual Network SS](images/vn1.png) ![Virtual Network SS](images/vn2.png)  ![Virtual Network SS](images/vn4.png)
+     ![Virtual Network SS](images/vn1.png) ![Virtual Network SS](images/vn2.png)  ![Virtual Network SS](images/vn4.png)
     - Navigate to the resource group, select Create a resource. From the Azure Marketplace, select Networking > Virtual network.
     - In Create virtual network, for Basics section provide this information: 
         - Subscription: Select the default subscription. 
@@ -34,7 +34,7 @@
         - Region: Select default region. 
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
-    - ![subnet SS](images/vn3.png)
+     ![subnet SS](images/vn3.png)
     - Select Add, then select Review + create. Leave the rest parameters as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
     
@@ -55,8 +55,6 @@
         - Standard- A standard performance tier for storing blobs, files, tables, queues, and Azure virtual machine disks.
         - Premium- A premium performance tier for storing unmanaged virtual machine disks.
     - Size(sku):  A single storage account can store up to 500 TB of data and like any other Azure service
-
-     ![create storage SS](images/storageaccount.png)
     - For creating a storage account navigate to the resource group and search resource storage account.
     - On the Storage Accounts window that appears, choose Add. 
     - Select the default subscription in which to create the storage account. 
@@ -84,7 +82,7 @@
         - NFS and glusterFS will create a container 
         - Azure files will create a file share. 
     - To access the containers and file share etc. navigate to storage account in resource group in the portal. 
-    - ![storage account preview]()
+     ![create storage SS](images/storageaccount.png)
 
   
 - **Database Resources** - 
