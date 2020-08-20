@@ -21,7 +21,7 @@ Moodle Migration involves following steps,
 
  Data Export from OnPrem to Azure Cloud
 - User must have Azure subscription to create a blob storage.
-- Select existing subscriotion or user can add a subscription [click here](https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade), can select [Pay-As-You-Go](https://azure.microsoft.com/en-in/offers/ms-azr-0003p/).
+- Select existing subscription or user can add a subscription [click here](https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade), can select [Pay-As-You-Go](https://azure.microsoft.com/en-in/offers/ms-azr-0003p/).
 - After creating the subscription, create a [Resource Group](https://ms.portal.azure.com/#create/Microsoft.ResourceGroup).
 - Create Azure Storage Account in the same Resource Group 
     - Create a [storage account](https://ms.portal.azure.com/#create/Microsoft.StorageAccount) with AutoKind value as "BlobStorage"
@@ -88,25 +88,25 @@ Moodle Migration involves following steps,
 * Add the tag for more specification 
 * Tags are name-value pairs that are used to organize resources in Azure Portal [click here](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources) 
  * Click on review and create for creating a resource group 
- * Once resource group is created navigate to it and start create resources into it. 
+ * Once resource group is created navigate to it and start create resources under it. 
 
-- ##### Below are the prerequisites resource to host the Moodle application 
+- ##### Creating resources to host the moodle application 
 - **Network Resources**
     * **Standard Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-standard-internal-portal) 
     *  ![loadbalancer](images/lb1.png) ![loadbalancer](images/lb2.png)
-    *  In the Basics tab, Select the default subscription and same resource created in above step, give the instance details such as name for load balancer, and default region. 
+    *  In the Basics tab, Select the same subscription and same resource created in above step, give the instance details such as name for load balancer, and default region. 
     *  Select the type as public and sku as standard. 
        -  A public load balancer can provide outbound connections for virtual machines (VMs) inside your virtual network. These connections are accomplished by translating their private IP addresses to public IP addresses. Public Load Balancers are used to load balance internet traffic to your VMs.
        - Standard tier can scale out to 1000 instances and Standard tier can scale out to 1000 instances 
     *  For Public IP address section ,Create a new IP address and give the IP address name and keep other parameters as default.
     *  Click next to tag section, if required give the tag value for more clarification. 
-    *  After giving the mandatory values click on review and create. [Click here](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-overview) 
+    *  After giving the mandatory values click on review and create. 
 
     - **Virtual Network** - An Azure Virtual Network is a representation of your own network in the cloud. It is a logical isolation of the Azure cloud dedicated to your subscription. When you create a VNet, your services and VMs within your VNet can communicate directly and securely with each other in the cloud. More information on Virtual Network [click here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview). 
      ![Virtual Network SS](images/vn1.png) ![Virtual Network SS](images/vn2.png)  ![Virtual Network SS](images/vn4.png)
     - Navigate to the resource group, select Create a resource. From the Azure Marketplace, select Networking > Virtual network.
     - In Create virtual network, for Basics section provide this information: 
-        - Subscription: Select the default subscription. 
+        - Subscription: Select the same subscription. 
         - Resource Group: Select same resource group. 
         - Name: Give the instance name. 
         - Region: Select default region. 
@@ -146,9 +146,7 @@ Moodle Migration involves following steps,
     - Choose the access tier for the same
     - Azure storage offers different access tiers, which allow you to store blob object data in the most cost-effective manner. The available access tiers include: Hot - Optimized for storing data that is accessed frequently. Cool - Optimized for storing data that is infrequently accessed and stored for at least 30 days
     - Leave the others tabs as default.
-    - If you plan to use [Azure Data Lake Storage](https://azure.microsoft.com/services/storage/data-lake-storage/), choose the Advanced tab, and then set Hierarchical namespace to Enabled.
-    - Select Review + Create to review your storage account settings and create the account. 
-    - Select Create. [Click here](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal)
+    - Select Review + Create to review your storage account settings and create the account.Select Create. [Click here](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal)
     - For more information about types of storage accounts and other storage account settings, see [Azure storage account overview](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview). For more information on resource groups, see [Azure Resource Manager overview](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview). 
     - For NFS and glusterFS:  
         - Replication is standard Locally-redundant storage (LRS)  
@@ -171,7 +169,7 @@ Moodle Migration involves following steps,
     ![mysql server ss](images/mysqldb1.png)
     - Select the Create a resource button (+) in the upper left corner of the portal in resource group
     - Select Databases > Azure Database for MySQL. If you cannot find MySQL Server under the Databases category, click See all to show all available database services. You can also type Azure Database for MySQL in the search box to quickly find the service. 
-    - Click Azure Database for MySQL tile. Fill out the Azure Database for MySQL form. 
+    - Click Azure Database for MySQL. Fill out the Azure Database for MySQL form. 
         - Server name: Choose a unique name that identifies your Azure Database for MySQL server. For example, mydemoserver. The domain name.mysql.database.azure.com is appended to the server name you provide. The server name can contain only lowercase letters, numbers, and the hyphen (-) character. It must contain from 3 to 63 characters. 
         - Subscription: Select the default subscription.
         - Resource group: The resource group will be auto selected. 
@@ -265,7 +263,7 @@ Moodle Migration involves following steps,
                 cd /home/azureadmin 
                 azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
             ```
-        - After downloading the moodle.tar.gz ,extract moodle.tar.gz file  
+        - Extract moodle.tar.gz file  
             ```
                 tar -zxvf yourfile.tar.gz
             ``` 
@@ -282,13 +280,13 @@ Moodle Migration involves following steps,
                 cd /home/azureadmin
                 azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder'
             ``` 
-        - After downloading the moodledata.tar.gz ,extract this moodledata.tar.gz file
+        - Extract this moodledata.tar.gz file
             ``` 
                 tar -zxvf yourfile.tar.gz
             ``` 
         
         - Then copy and replace this moodledata (/moodle/moodledata) folder with existing folder 
-        - Go as a root user and copy the moodledata folder existing path 
+        - Copy the moodledata folder existing path 
             ```
                 cp /home/azureadmin/moodledata /moodle/
             ``` 
@@ -311,13 +309,12 @@ Moodle Migration involves following steps,
             cd /home/azureadmin 
             azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
         ```
-        - After downloading the database.tar.gz file will be present
         - Extract this database.tar.gz file
         ```
             tar -zxvf yourfile.tar.gz
         ```
         - The database folder will be extracted which contains the .sql file. 
-        - Go as a root user and navigate to database folder and import the .sql file. - For database import first create a database.
+        - Navigate to database folder and import the .sql file. - For database import first create a database.
         ```
             mysql -h $server_name -u $ server_admin_login_name -p$admin_password -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
         ```
@@ -346,22 +343,20 @@ Moodle Migration involves following steps,
             cd /home/azureadmin 
             azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
         ```
-    - After downloading the configuration.tar.gz file will be present.
-    - Extract this d configuration.tar.gz file
+    - Extract this configuration.tar.gz file
         ```
             tar -zxvf yourfile.tar.gz
         ```
     - The configuration folder will be extracted with nginx and php configuration files.
     - For changing nginx configuration.
         - First change the database details in moodle configuration file (/moodle/config.php)
-        - Go to root user and copy the nginx configuration file
         ```
             mkdir  -p /home/azureadmin/backup/
             sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
             cd /home/azureadmin/storage/configuration/
             sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
         ```
-        - Change the log paths and mention the example
+        - Change the log paths.Log path is defaulted to /var/log/nginx.
         - DNS name and certs and its path.
     - copy the php config file from blob storage to the php config folder. 
         ```
