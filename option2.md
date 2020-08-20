@@ -113,6 +113,7 @@ Moodle Migration involves following steps,
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
 ![subnet SS](images/vn3.png)
+
     - Select Add, then select Review + create. Leave the rest parameters as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
     
