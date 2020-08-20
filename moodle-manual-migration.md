@@ -29,10 +29,10 @@ Moodle Migration involves following steps,
 - Import data to Azure cloud
 
 ### Option 1: Migrating Moodle with Azure ARM Templates 
-* Moodle can be installed in two ways. 
-* Moodle installation on Azure with 4 predefined templates. 
-* Fully Configurable deployment provides various options to select with when the requirement does not match with the predefined ARM templates. [Click here](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
-* First choice is a GitHub repository with 4 predefined options such as Minimal, Short-to-Mid, Large, Maximal. [Click here](https://github.com/Azure/moodle)
+* Moodle can be installed in two ways.
+    - Moodle installation on Azure with 4 predefined templates. 
+    - Fully Configurable deployment provides various options to select with when the requirement does not match with the predefined ARM templates. [Click here](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+* The 4 predefined templates options such as Minimal, Short-to-Mid, Large, Maximal are available on [GitHub repository](https://github.com/Azure/moodle).
     - Minimal: This deployment will use NFS, MySQL, and smaller auto scale web frontend VM sku (1 core) that will give faster deployment time (less than 30 minutes) and requires only 2 VM cores currently that will fit even in a free trial Azure subscription.  
     - Small to Mid: Supporting up to 1000 concurrent users. This deployment will use NFS (no high availability) and MySQL (8 vCores), without other options like elastic search or Redis cache.  
     - Large (high availability): Supporting more than 2000 concurrent users. This deployment will use Azure Files, MySQL (16 vCores) and Redis cache, without other options like elastic search.  
