@@ -108,7 +108,7 @@ Moodle Migration involves following steps,
 
 - ##### Creating Resources to host the Moodle application 
 - **Network Resources**
-    * **Standard Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-standard-internal-portal) 
+    * **Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-standard-internal-portal) 
         ```
             #command to deploy load balancer
         ```
@@ -122,7 +122,7 @@ Moodle Migration involves following steps,
 
     - **Virtual Network** - An Azure Virtual Network is a representation of your own network in the cloud. It is a logical isolation of the Azure cloud dedicated to your subscription. When you create a VNet, your services and VMs within your VNet can communicate directly and securely with each other in the cloud. More information on Virtual Network [click here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview). 
         ```
-            #command to deploy virtual network
+            #command to create virtual network
         ```
     - Navigate to the resource group, select Create a resource. From the Azure Marketplace, select Networking > Virtual network.
     - In Create virtual network, for Basics section provide this information: 
@@ -133,11 +133,15 @@ Moodle Migration involves following steps,
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
         ```
-            #command to deploy subnet
+            #command to create subnet
         ```
 
     - Select Add, then select Review + create. Leave the rest parameters as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
+
+    - **Azure Application GateWay** - An Azure Application Gateway is a web traffic load balancer that enables you to manage traffic to your web applications. Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and UDP) and route traffic based on source IP address and port, to a destination IP address and port. For more information [click here](https://docs.microsoft.com/en-us/azure/application-gateway/overview).
+        - To deploy the Application gate way from Azure Portal [click here](https://docs.microsoft.com/en-us/azure/application-gateway/quick-create-portal).
+        - To deploy the Application gate way from Azure CLI [click here](https://docs.microsoft.com/en-us/azure/application-gateway/quick-create-cli)
     
 - **Storage Resources**
     * An Azure storage account contains all of your Azure Storage data objects: blobs, files, queues, tables, and disks. The storage account provides a unique namespace for your Azure Storage data that is accessible from anywhere in the world over HTTP or HTTPS
@@ -294,7 +298,7 @@ Moodle Migration involves following steps,
         -   Create a moodle shared folder (/moodle)
 
     - *Download on-prem archive file to VM*
-        Download the onprem archived data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location
+        - Download the onprem archived data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location
         - Download moodle.tar.gz file from the blob storage. The path to download will be /home/azureadmin.
         
             ```
@@ -339,8 +343,6 @@ Moodle Migration involves following steps,
                 cp /home/azureadmin/moodledata /moodle/
             ``` 
     
-    **Post-Migration**:
-        In post migration configuring php, webserves and certs. 
     -   **Configuring permissions**
         -   Set the Moodle and Moodledata folder permissions.
         -   Set 755 and www-data owner:group permissions to Moodle folder
@@ -379,66 +381,67 @@ Moodle Migration involves following steps,
                 mysql -h db_server_name -u db_login_name -pdb_pass dbname >/path/to/.sql file 
             ```
     
-    - Modify the Moodle configuration 
-    - Download the configuration.tar.gz from the blob storage.
-    - The path to download will be /home/azureadmin
-        ```
-            cd /home/azureadmin 
-            azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-        ```
-    - Extract this configuration.tar.gz file
-        ```
-            tar -zxvf yourfile.tar.gz
-        ```
-    - The configuration folder will be extracted with nginx and php configuration files.
-    - For changing nginx configuration.
+    - **Configuring Php & WebServer**
+        - Download the configuration.tar.gz from the blob storage.
+        - The path to download will be /home/azureadmin
+            ```
+                cd /home/azureadmin 
+                azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+            ```
+        - Extract configuration.tar.gz file
+            ```
+                tar -zxvf yourfile.tar.gz
+            ```
+        - The configuration folder will be extracted with nginx and php configuration files.
+        
         - First change the database details in moodle configuration file (/moodle/config.php)
-        ```
-            mkdir  -p /home/azureadmin/backup/
-            sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
-            cd /home/azureadmin/storage/configuration/
-            sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
-        ```
-        - Change the log paths.Log path is defaulted to /var/log/nginx.
-        - DNS name and certs and its path.
-    - copy the php config file from blob storage to the php config folder. 
-        ```
-            sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup 
-            sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/ 
-            sudo systemctl restart nginx 
-            sudo systemctl restart php(phpVersion)-fpm  
-            ex: sudo systemctl restart php7.4-fpm  
-        ```
+            ```
+                mkdir  -p /home/azureadmin/backup/
+                sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
+                cd /home/azureadmin/storage/configuration/
+                sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
+            ```
+            Note: Update the following parameters in config.php
+                - dbhost, dbname, dbuser, dbpass, dataroot and wwwroot.
+                
+        - copy the php config file from blob storage to the php config folder. 
+            ```
+                sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup 
+                sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/ 
+                sudo systemctl restart nginx 
+                sudo systemctl restart php(phpVersion)-fpm  
+                ex: sudo systemctl restart php7.4-fpm  
+            ```
+ 
 - **Scale Set:** 
-    - A virtual machine scale set allows you to deploy and manage a set of auto-scaling virtual machines. You can scale the number of VMs in the scale set manually, or define rules to auto scale based on resource usage like CPU, memory demand, or network traffic. An Azure load balancer then distributes traffic to the VM instances in the scale set. [Click here](https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/quick-create-portal) 
-        - Create a scale set in same resource group.
-        - Prerequisites is the to create a public Standard Load Balancer. 
-        - The name and public IP address created are automatically configured as the load balancer's front end. 
-        - You can deploy a scale set with a Windows Server image or Linux image such as RHEL, CentOS, Ubuntu, or SLES. 
+    - A virtual machine scale set allows you to deploy and manage a set of auto-scaling virtual machines. You can scale the number of VMs in the scale set manually or define rules to auto scale based on resource usage like CPU, memory demand, or network traffic. An Azure load balancer then distributes traffic to the VM instances in the scale set. For more information [click here](https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/quick-create-portal).
+    - Create a scale set in same resource group.
+    - Prerequisites is the to create a public Standard Load Balancer.
+        - User can create Azure Application Gateway. For more information [click here](https://docs.microsoft.com/en-us/azure/application-gateway/overview).
+    - The name and public IP address created are automatically configured as the load balancer's front end. 
+        - Scale set creates an VM instance with Ubuntu 16.04 OS.
         - Search Virtual machine scale sets. Select Create on the Virtual machine scale sets page, which will open the Create a virtual machine scale set page. 
         - In the Basics tab, under Project details, select the subscription and then choose to same resource. 
         - Type name as the name for your scale set. 
         - In Region, select the same region. 
         - Leave the default value of Scale Set VMs for Orchestration mode. 
         - Enter your desired username, and select which authentication type as SSH and give the same SSH key and username as azureadmin.
-        
-         ![scale set ss 1](images/vmss1.png)![scale set ss 2](images/vmss2.png)
         - Select the image or browse the image for the scale set 
         - Select the size for the disk. 
         - Select the authentication type as SSH and provide the same username as azureadmin and SSH key 
         - Click Next for the disk tab select the OS disk type as per choice 
-        
-        ![scale set ss 3](images/vmss3.png)
-        - Click Next for the networking section 
-        
-        ![scaleset ss 4](images/vmss4.png)
-        - Select the same virtual network as selected for virtual machine. 
-        
-        ![scaleset ss 5](images/vmss5.png)
+        - Click Next for the networking section
+        - Select the same virtual network as selected for virtual machine.
         - Give the instance count and the scaling policy as manual or custom. 
         - Select Next and keep the other things as default. 
         - Click on review and create and the scale set. 
-        
+
+    - Scale set can be created from Azure CLI
+        ```
+            # Command for creating Scale Set
+        ```
+    - VMSS will create a VM instance with an internal IP. User need to have a VPN gateway to access the VM. 
+    - To setup the Virtual Network Gateway please read the [document](GitHub Link to be provided).   
         - Execute the webserver.sh script in the VMSS extension 
         - Install webserver apache/nginx 
         - Install php with extensions 
@@ -453,4 +456,12 @@ Moodle Migration involves following steps,
     - Restart php-fpm server 
     - With the above steps Moodle infrastructure is ready 
     - User now hit the load balancer DNS name to get the migrated moodle web page. 
+    
+**Post Migration**
+
+- **Virtual Machine:**
+    -                
+        - Change the log paths. Log path is defaulted to /var/log/nginx.
+        - DNS name and certs and its path.
+        
     
