@@ -76,7 +76,7 @@ Moodle Migration involves following steps,
         ```
 - Create an archive tar.gz file of backup folder
     ```
-        tar -zcvf storage.tar.gz <source/folder/name>
+        tar -zcvf moodle.tar.gz <source/folder/name>
     ```
 - Copy the onprem archive file to blob storage by following command.
     - To copy use AzCopy user should generate SAS Token.
@@ -85,7 +85,7 @@ Moodle Migration involves following steps,
     - copy the SAS token for further use.
         ```
             az storage container create --account-name <storageAccontName> --name <containerName> --sas-token <SAS_token>
-            sudo azcopy copy '/path/to/location/storage.tar' 'https://<storageAccountName>.blob.core.windows.net/<containerName>/<dns>/<SAStoken>
+            sudo azcopy copy '/path/to/location/moodle.tar' 'https://<storageAccountName>.blob.core.windows.net/<containerName>/<dns>/<SAStoken>
         ```
     - With the above steps onprem data is compressed and exported to Azure blob storage.
     - Import the data from Azure blob storage to VM to migrate.
@@ -265,43 +265,61 @@ Moodle Migration involves following steps,
      ![putty ss1](images/puttyloginpage.PNG)   ![putty ss1](images/puttykeybrowse.PNG)
 
     -   ##### Download and execute a moodle script
-    -   Download install_prerequisites.sh script.
+    
+    **Pre-Migration:**
+
+    -   *Download install_prerequisites.sh script*.
+        - install_prerequisites.sh script will be downloaded from GitHub. It will downloaded to /home/azureadmin/ path.
+        - install_prerequisites.sh will install the prerequisites for Moodle such as webservers, php and extensions.
+        Note: All the scripts should be executed as a root user.
         ```
+            sudo -s
             cd /home/azureadmin/
-            wget 
+            wget <git raw link for install_prerequisites.sh>
         ```
     -   Run the install_prerequisites.sh script
         ```
-            bash install_prerequisites.sh
+            bash install_prerequisites.sh <webserverType> <WebserverVersion> <phpVersion>
+        ```
+        Note: on-prem has any additional extensions those will be installed by the user.
+
+        ```
+            sudo apt-get install -y php-<extensionName>
         ```
     -   Above script will perform following task
-        -   Install web server (nginx/apache)
+        -   Install web server (nginx/apache) with the given version
         -   Install PHP with its extensions
+            - List of Extensions are below 
+                - fpm, cli, curl, zip, pear, mbstring, dev, mcrypt, soap, json, redis, bcmath, gd, mysql, xmlrpc, intl, xml and bz2
         -   Create a moodle shared folder (/moodle)
-    -   Download and run the migrate_moodle.sh script
-        ```
-            cd /home/azureadmin/
-            wget 
-            bash migrate_moodle.sh
-        ```
-    - This script will install empty moodle instance 
-    - Download the onprem compressed data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location
-     - Replace the moodle folder  
-        - Download moodle.tar.gz file from the blob storage. The path to download will be /home/azureadmin. Navigate to this path 
+
+    - *Download on-prem archive file to VM*
+        Download the onprem archived data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location
+        - Download moodle.tar.gz file from the blob storage. The path to download will be /home/azureadmin.
         
             ```
                 cd /home/azureadmin 
                 azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
             ```
-        - Extract moodle.tar.gz file  
+        - Extract archive moodle.tar.gz file  
             ```
                 tar -zxvf yourfile.tar.gz
+                ex: tar -zxvf moodle.tar.gz
             ``` 
+    -   *Download and run the migrate_moodle.sh script*
+        - migrate_moodle.sh script will be downloaded from GitHub. It will downloaded to /home/azureadmin/ path.
+        - copying the Moodle site, Moodledata folders and configuring of php, webserver will be processed while executing migrate_moodle.sh
+        ```
+            cd /home/azureadmin/
+            wget <git raw link for migrate_moodle.sh>
+            bash migrate_moodle.sh
+        ```
+    - This script will install empty moodle instance.
         - Then copy and replace this moodle folder with existing folder 
         - Before accessing the moodle folder switch to root user and copy the moodle folder to existing path 
             ```
                 cp /home/azureadmin/moodle /moodle/html
-         ```
+            ```
     * Replace the moodledata folder  
         -  Download moodledata.tar.gz file from the blob storage.
         - Navigate to the path 
@@ -320,52 +338,47 @@ Moodle Migration involves following steps,
             ```
                 cp /home/azureadmin/moodledata /moodle/
             ``` 
-    -   Set the configuration
-    -   Set the Moodle and Moodledata folder permissions.
-    -   Set 755 and www-data owner:group permissions to Moodle folder
-        ```sh
-        sudo chmod 755 /moodle
-        sudo chown -R www-data:www-data /moodle 
-        ```
-    -   Set 770 and www-data owner:group permissions to MoodleData folder
-        ```
-        sudo chmod 755 /moodle/moodledata
-        sudo chown -R www-data:www-data /moodle/moodledata
-        ```
-    -  Importing the .sql file  
+    
+    **Post-Migration**:
+        In post migration configuring php, webserves and certs. 
+    -   **Configuring permissions**
+        -   Set the Moodle and Moodledata folder permissions.
+        -   Set 755 and www-data owner:group permissions to Moodle folder
+            ```
+                sudo chmod 755 /moodle
+                sudo chown -R www-data:www-data /moodle 
+            ```
+        -   Set 770 and www-data owner:group permissions to MoodleData folder
+            ```
+                sudo chmod 755 /moodle/moodledata
+                sudo chown -R www-data:www-data /moodle/moodledata
+            ```
+    -  **Importing the .sql file**  
         -   Download the database.tar.gz from the blob storage
         -   The path to download will be /home/azureadmin so navigate to this path
-        ```
-            cd /home/azureadmin 
-            azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
-        ```
+            ```
+                cd /home/azureadmin 
+                azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+            ```
         - Extract this database.tar.gz file
-        ```
-            tar -zxvf yourfile.tar.gz
-        ```
+            ```
+                tar -zxvf yourfile.tar.gz
+            ```
         - The database folder will be extracted which contains the .sql file. 
-        - Navigate to database folder and import the .sql file. - For database import first create a database.
-        ```
-            mysql -h $server_name -u $ server_admin_login_name -p$admin_password -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
-        ```
-    - Change the permissions.
-        ```
-            mysql -h $ server_name -u $ server_admin_login_name -p${admin_password } -e "GRANT ALL ON ${moodledbname}. * TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';" 
-        ```
-    - Import the database into it.
-        ```
-            mysql -h db_server_name -u db_login_name -pdb_pass dbname >/path/to/.sql file 
-        ```
-    - Set 755 and www-data owner:group permissions to Moodle folder.
-        ```
-            sudo chmod 755 /moodle
-            sudo chown -R www-data:www-data /moodle 
-        ```
-    - Set 770 and www-data owner:group permissions to MoodleData folder
-        ```
-            sudo chmod 755 /moodle/moodledata
-            sudo chown -R www-data:www-data /moodle/moodledata 
-        ```
+        - Navigate to database folder and import the .sql file. - For importing database need to create a database.
+            ```
+                mysql -h $server_name -u $ server_admin_login_name -p$admin_password -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
+            ```
+            Note: User can get the Database servername, admin login, password from the azure portal, select the created Azure Database for MySQL.
+        - Change the permissions.
+            ```
+                mysql -h $ server_name -u $ server_admin_login_name -p${admin_password } -e "GRANT ALL ON ${moodledbname}. * TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';" 
+            ```
+        - Import the database.
+            ```
+                mysql -h db_server_name -u db_login_name -pdb_pass dbname >/path/to/.sql file 
+            ```
+    
     - Modify the Moodle configuration 
     - Download the configuration.tar.gz from the blob storage.
     - The path to download will be /home/azureadmin
