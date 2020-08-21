@@ -301,7 +301,26 @@ Data Export from OnPrem to Azure Cloud
         ```
     
         - User can get the site logs at /var/log/nginx/ path. 
-    - DNS name and certs and its path 
+    - DNS name and certs and its path
+     
+    - **Certs:**
+        - *SSL Certs*: The certificates for your Moodle application reside in /moodle/certs/
+        
+        - Copy over the .crt and .key files over to /moodle/certs/. The file names should be changed to nginx.crt and nginx.key in order to be recognized by the configured nginx servers. Depending on your local environment, you may choose to use the utility scp or a tool like WinSCP to copy these files over to the cluster controller virtual machine.
+
+        - You can also generate a self-signed certificate, useful for testing only:
+            ```
+                openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /moodle/certs/nginx.key \
+                -out /moodle/certs/nginx.crt \
+                -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=mydomain.com"
+            ```
+        - It's recommended that the certificate files be read-only to owner and that these files are owned by www-data:
+            ```
+                chown www-data:www-data /moodle/certs/nginx.*
+                chmod 400 /moodle/certs/nginx.*
+            ```
+
     - Next copy the php config file from blob storage to the php config folder.
         ```
             sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup

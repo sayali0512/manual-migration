@@ -296,6 +296,13 @@ Moodle Migration involves following steps,
             - List of Extensions are below 
                 - fpm, cli, curl, zip, pear, mbstring, dev, mcrypt, soap, json, redis, bcmath, gd, mysql, xmlrpc, intl, xml and bz2
         -   Create a moodle shared folder (/moodle)
+            ```
+                mkdir -p /moodle
+                mkdir -p /moodle/moodledata
+                mkdir -p /moodle/html
+                mkdir -p /moodle/certs
+            ```
+                
 
     - *Download on-prem archive file to VM*
         - Download the onprem archived data from Azure Blob storage to VM such as Moodle, Moodledata, configuration folders with database backup file to /home/azureadmin location
@@ -445,15 +452,83 @@ Moodle Migration involves following steps,
     - To setup the Virtual Network Gateway please read the [document](GitHub Link to be provided).
 
     - **Configuring VMSS**   
+        <!-- 
+        - install php, ngnix by running a script with versions as input
+        - create a shared folder (/moodle)
+        - if FileServerType is Azurefiles then include steps to mount azure files 
+        - if FileServerType is nfs/glusterFS then provide ms docs links
+        - configure php and nginx
+        - set the cron jobs
+        - set the log paths
+        - restart the servers
+        -->
 
-        - Execute the webserver.sh script in the VMSS extension 
-        - Install webserver apache/nginx 
-        - Install php with extensions 
-        - Modify the Moodle, nginx, PHP configuration with on-prem. 
-        - Change the database details in moodle configuration file (/moodle/config.php) 
-        - Download and Copy the nginx config file from blob storage to the nginx config folder. 
-        - Download and Copy the php config file from blob storage to the php config folder. 
-        - Create a local copy of moodle from shared folder 
+        - *Download install_prerequisites.sh script*.
+            - install_prerequisites.sh script will be downloaded from GitHub. It will downloaded to /home/azureadmin/ path.
+            - install_prerequisites.sh will install the prerequisites for Moodle such as webservers, php and extensions.
+            Note: All the scripts should be executed as a root user.
+                ```
+                    sudo -s
+                    cd /home/azureadmin/
+                    wget <git raw link for install_prerequisites.sh>
+                ```
+            - Run the install_prerequisites.sh script
+                ```
+                    bash install_prerequisites.sh <webserverType> <WebserverVersion> <phpVersion>
+                ```
+            Note: If on-prem has any additional php extensions those will be installed by the user.
+
+                ```
+                    sudo apt-get install -y php-<extensionName>
+                ```
+        - Above script will perform following task
+            -   Install web server (nginx/apache) with the given version
+            -   Install PHP with its extensions
+                - List of Extensions are below 
+                    - fpm, cli, curl, zip, pear, mbstring, dev, mcrypt, soap, json, redis, bcmath, gd, mysql, xmlrpc, intl, xml and bz2
+            -   Create a moodle shared folder (/moodle)
+                ```
+                    mkdir -p /moodle
+                    mkdir -p /moodle/moodledata
+                    mkdir -p /moodle/html
+                    mkdir -p /moodle/certs
+                ```
+        - Mount Azure File share in VM instance 
+            - Follow the [documentation](GitHub document link for mounting AF Share) to set the Azure File Share on VMSS
+            - If user want to set the File Server as NFS follow the [docs](link for mounting nfs).
+       
+        - **Configuring Php & WebServer**
+        - Download the configuration.tar.gz from the blob storage.
+        - The path to download will be /home/azureadmin
+            ```
+                cd /home/azureadmin 
+                azcopy copy 'https://storageaccount.blob.core.windows.net/container/BlobDirectory/*' 'Path/to/folder' 
+            ```
+        - Extract configuration.tar.gz file
+            ```
+                tar -zxvf yourfile.tar.gz
+            ```
+        - The configuration folder will be extracted with nginx and php configuration files.
+        
+        - First change the database details in moodle configuration file (/moodle/config.php)
+            ```
+                mkdir  -p /home/azureadmin/backup/
+                sudo mv /etc/nginx/sites-enabled/<dns>.conf  /home/azureadmin/backup/ 
+                cd /home/azureadmin/storage/configuration/
+                sudo cp <dns>.conf  /etc/nginx/sites-enabled/ 
+            ```
+            Note: Update the following parameters in config.php
+                - dbhost, dbname, dbuser, dbpass, dataroot and wwwroot.
+                
+        - copy the php config file from blob storage to the php config folder. 
+            ```
+                sudo mv /etc/php/<phpVersion>/fpm/pool.d/www.conf /home/azureadmin/backup 
+                sudo  cp /home/azureadmin/storage/configuration/www.conf /etc/php/<phpVersion>/fpm/pool.d/ 
+                sudo systemctl restart nginx 
+                sudo systemctl restart php(phpVersion)-fpm  
+                ex: sudo systemctl restart php7.4-fpm  
+            ```
+
     - **Set a cron job** 
         - VMSS will have a local copy of the moodle shared content to /var/www/html/
         - Whenever there is a change in shared folder a file with time stamp will get updated.
@@ -479,10 +554,37 @@ Moodle Migration involves following steps,
     - User now hit the load balancer DNS name to get the migrated moodle web page. 
     
 **Post Migration**
-
+    -   Post migration of Moodle application user need to update the certs log paths as follows
+    
 - **Virtual Machine:**
     -                
-        - Change the log paths. Log path is defaulted to /var/log/nginx.
+        - Change the log paths from on-prem location.
+        - Log path is defaulted to /var/log/nginx.
         - DNS name and certs and its path.
+        - Update the time stap to update the local copy in VMSS instance.
+    - **Certs:**
+        - *SSL Certs*: The certificates for your Moodle application reside in /moodle/certs/
+        
+        - Copy over the .crt and .key files over to /moodle/certs/. The file names should be changed to nginx.crt and nginx.key in order to be recognized by the configured nginx servers. Depending on your local environment, you may choose to use the utility scp or a tool like WinSCP to copy these files over to the cluster controller virtual machine.
+
+        - You can also generate a self-signed certificate, useful for testing only:
+            ```
+                openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /moodle/certs/nginx.key \
+                -out /moodle/certs/nginx.crt \
+                -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=mydomain.com"
+            ```
+        - It's recommended that the certificate files be read-only to owner and that these files are owned by www-data:
+            ```
+                chown www-data:www-data /moodle/certs/nginx.*
+                chmod 400 /moodle/certs/nginx.*
+            ```
+
+- **Virtual Machine Scale Set:**
+    -                
+        - Change the log paths from on-prem location.
+        - Log path is defaulted to /var/log/nginx/.
+            - access.log and error.log are created.
+        
         
     
