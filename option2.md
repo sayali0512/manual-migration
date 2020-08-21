@@ -264,9 +264,9 @@ Moodle Migration involves following steps,
     
      ![putty ss1](images/puttyloginpage.PNG)   ![putty ss1](images/puttykeybrowse.PNG)
 
-    -   ##### Download and execute a moodle script
+   
     
-    **Pre-Migration:**
+    ### Download and execute a moodle scripts
 
     -   *Download install_prerequisites.sh script*.
         - install_prerequisites.sh script will be downloaded from GitHub. It will downloaded to /home/azureadmin/ path.
@@ -281,7 +281,7 @@ Moodle Migration involves following steps,
         ```
             bash install_prerequisites.sh <webserverType> <WebserverVersion> <phpVersion>
         ```
-        Note: on-prem has any additional extensions those will be installed by the user.
+        Note: If on-prem has any additional php extensions those will be installed by the user.
 
         ```
             sudo apt-get install -y php-<extensionName>
