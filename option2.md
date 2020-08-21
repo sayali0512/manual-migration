@@ -431,8 +431,9 @@ Moodle Migration involves following steps,
         - Select the authentication type as SSH and provide the same username as azureadmin and SSH key 
         - Click Next for the disk tab select the OS disk type as per choice 
         - Click Next for the networking section
-        - Select the same virtual network as selected for virtual machine.
-        - Give the instance count and the scaling policy as manual or custom. 
+        - Select the created virtual network.
+        - Give the instance count and the scaling policy as manual or custom.
+            - set the rules to scale up/down a VM based on the average cpu percentage.
         - Select Next and keep the other things as default. 
         - Click on review and create and the scale set. 
 
@@ -441,7 +442,10 @@ Moodle Migration involves following steps,
             # Command for creating Scale Set
         ```
     - VMSS will create a VM instance with an internal IP. User need to have a VPN gateway to access the VM. 
-    - To setup the Virtual Network Gateway please read the [document](GitHub Link to be provided).   
+    - To setup the Virtual Network Gateway please read the [document](GitHub Link to be provided).
+
+    - **Configuring VMSS**   
+
         - Execute the webserver.sh script in the VMSS extension 
         - Install webserver apache/nginx 
         - Install php with extensions 
@@ -450,10 +454,27 @@ Moodle Migration involves following steps,
         - Download and Copy the nginx config file from blob storage to the nginx config folder. 
         - Download and Copy the php config file from blob storage to the php config folder. 
         - Create a local copy of moodle from shared folder 
-    - Set a cron job to copy the shared moodle content to /var/www/html/ folder whenever there is a change in timestamp in shared folder. 
-    - Restart servers 
-    - Restart nginx server 
-    - Restart php-fpm server 
+    - **Set a cron job** 
+        - VMSS will have a local copy of the moodle shared content to /var/www/html/
+        - Whenever there is a change in shared folder a file with time stamp will get updated.
+        - Cron job will look for the change in time stamp for every minute. 
+        - If the change is identified by the Cron job, It will copy the shared folder to /var/www/html/
+
+        - *Download and run setup_cron.sh:*
+            - setup_cron.sh has set of commands which will set the cron job to create a local copy of shared folder in VMSS.
+                ```
+                    sudo -s
+                    cd /home/azureadmin/
+                    wget <git raw link for setup_cron.sh>
+                    bash setup_cron.sh
+                ```
+        Note: nginx configuration will point root directory as /var/www/html/ in the instance
+    
+    - Restart nginx server & php-fpm server
+        ```
+            sudo systemctl restart nginx 
+            sudo systemctl restart php(phpVersion)-fpm  
+        ```
     - With the above steps Moodle infrastructure is ready 
     - User now hit the load balancer DNS name to get the migrated moodle web page. 
     
