@@ -1,6 +1,7 @@
 ## Moodle Manual  Migration
 This document explains how to migrate Moodle from OnPrem servers to Azure cloud.
 ## Prerequisites
+- If the predefined templates does not match with on-prem configuration then on-prem Moodle has to be upgraded to more recent versions.
 - Must have access to the OnPrem servers to take backup of Moodle and database/configurations.
 - Should have a Azure subscription and the Azure Blob storage created before migration.
 - Azure cli should be installed in onprem to use AZCOPY
@@ -15,19 +16,19 @@ This document explains how to migrate Moodle from OnPrem servers to Azure cloud.
 ## Migration
 
 Moodle Migration involves following steps,
-- Data Export from OnPrem to Azure Cloud
-- Import data from Azure cloud.
-- DB migration.
+- **Pre Migration**
+    - Data Export from OnPrem to Azure Cloud
+    - Import data from Azure cloud.
+    - Creating resources on Azure
+- **Post Migration**
+    - DB migration.
+    - Setting up configuration
+    - Configuring certs and DNS name
 
- Data Export from OnPrem to Azure Cloud
+### Pre Migration
+- *Data Export from OnPrem to Azure Cloud*
 - User must have Azure subscription to create a blob storage.
 - Select existing subscription or user can add a subscription [click here](https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade), can select [Pay-As-You-Go](https://azure.microsoft.com/en-in/offers/ms-azr-0003p/).
-- After creating the subscription, create a [Resource Group](https://ms.portal.azure.com/#create/Microsoft.ResourceGroup).
-- Create Azure Storage Account in the same Resource Group 
-    - Create a [storage account](https://ms.portal.azure.com/#create/Microsoft.StorageAccount) with AutoKind value as "BlobStorage"
-![Blob-Storage](images/blobstorage.png)
-    - Give the storage account name must be in combination of lowercase and numericals, click on create button as shown above.
-    - Storage Account is created, can be used to store the onprem data.
 - Install Azure CLI to copy the onprem data to cloud.
     - Install Azure CLI 
         ```
@@ -44,6 +45,19 @@ Moodle Migration involves following steps,
         ```
             az login -u <username> -p <password>
         ```
+- After creating the subscription, create a [Resource Group](https://ms.portal.azure.com/#create/Microsoft.ResourceGroup).
+    ```
+        # cmd to create a RG
+        az deployment group create --resource-group <resource-group-name> --template-file <path-to-template>
+    ```
+- Create Azure Storage Account in the same Resource Group 
+    - Create a [storage account](https://ms.portal.azure.com/#create/Microsoft.StorageAccount) with AutoKind value as "BlobStorage"
+    ```
+        # cmd to create a Storage account
+        
+    ```
+    - Give the storage account name must be in combination of lowercase and numericals, click on create button as shown above.
+    - Storage Account is created, can be used to store the onprem data.
 - Take backup of onprem data such as moodle, moodledata, configurations and database backup file to a folder
 - Moodle and Moodledata
     - Moodle folder consists of site HTML content and Moodledata contains Moodle site data
@@ -76,24 +90,28 @@ Moodle Migration involves following steps,
     - With the above steps onprem data is compressed and exported to Azure blob storage.
     - Import the data from Azure blob storage to VM to migrate.
 
-### Option 2: Migrating Moodle without template 
+### Option 2: Moodle Migration without ARM Template
 
- * This option is to create the infrastructure manually in azure and migrate Moodle on it. 
+ * This option is to create the infrastructure manually in Azure and migrate Moodle on it. 
  * The Azure infrastructure is the basic skeleton of the resources which will host the Moodle application. 
  * For installing the infrastructure for Moodle navigate to the [azure portal](portal.azure.com) 
- * In the home section go the resource group section and add a new a resource group for the Moodle infrastructure [click here](https://ms.portal.azure.com/#blade/HubsExtension/BrowseResourceGroups) 
-  ![createRG](images/resourcegroup.png)
-* Select the created subscription, give the resource group name and select the region for deployment
-* Note: The subscription and region will be default creating every resources 
+ * In the home section go the resource group section and add a new a resource group for the Moodle infrastructure [click here](https://ms.portal.azure.com/#blade/HubsExtension/BrowseResourceGroups) 000
+ * Select the created subscription, give the resource group name and select the region for deployment.
+    ```
+        # Command to create a RG
+    ```
+* Note: The subscription and region will be same for all the resources created under the deployment.
 * Add the tag for more specification 
 * Tags are name-value pairs that are used to organize resources in Azure Portal [click here](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources) 
  * Click on review and create for creating a resource group 
  * Once resource group is created navigate to it and start create resources under it. 
 
-- ##### Creating resources to host the moodle application 
+- ##### Creating Resources to host the Moodle application 
 - **Network Resources**
     * **Standard Load Balancer:**  An Azure load balancer is a Layer-4 (TCP, UDP) load balancer that provides high availability by distributing incoming traffic among healthy VMs. A load balancer health probe monitors a given port on each VM and only distributes traffic to an operational VM. [click here](https://docs.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-standard-internal-portal) 
-    *  ![loadbalancer](images/lb1.png) ![loadbalancer](images/lb2.png)
+        ```
+            #command to deploy load balancer
+        ```
     *  In the Basics tab, Select the same subscription and same resource created in above step, give the instance details such as name for load balancer, and default region. 
     *  Select the type as public and sku as standard. 
        -  A public load balancer can provide outbound connections for virtual machines (VMs) inside your virtual network. These connections are accomplished by translating their private IP addresses to public IP addresses. Public Load Balancers are used to load balance internet traffic to your VMs.
@@ -103,7 +121,9 @@ Moodle Migration involves following steps,
     *  After giving the mandatory values click on review and create. 
 
     - **Virtual Network** - An Azure Virtual Network is a representation of your own network in the cloud. It is a logical isolation of the Azure cloud dedicated to your subscription. When you create a VNet, your services and VMs within your VNet can communicate directly and securely with each other in the cloud. More information on Virtual Network [click here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview). 
-     ![Virtual Network SS](images/vn1.png) ![Virtual Network SS](images/vn2.png)  ![Virtual Network SS](images/vn4.png)
+        ```
+            #command to deploy virtual network
+        ```
     - Navigate to the resource group, select Create a resource. From the Azure Marketplace, select Networking > Virtual network.
     - In Create virtual network, for Basics section provide this information: 
         - Subscription: Select the same subscription. 
@@ -112,7 +132,9 @@ Moodle Migration involves following steps,
         - Region: Select default region. 
     - Select Next: IP Addresses, and for IPv4 address space, enter 10.1.0.0/16. 
     - Select Add subnet, then enter Subnet name and 10.1.0.0/24 for Subnet address range.
-![subnet SS](images/vn3.png)
+        ```
+            #command to deploy subnet
+        ```
 
     - Select Add, then select Review + create. Leave the rest parameters as default and select Create.
     - For more Details [click here](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)
@@ -160,14 +182,18 @@ Moodle Migration involves following steps,
         - Azure files will create a file share. 
     - To access the containers and file share etc. navigate to storage account in resource group in the portal. 
     
-    ![create storage SS](images/storageaccount.png)
+        ```
+            #command to deploy storage account
+        ```
 
   
 - **Database Resources** - 
     - Creates an Azure Database for MySQL server. [click here](https://docs.microsoft.com/en-in/azure/mysql/).
     - Azure Database for MySQL is easy to set up, manage and scale. It automates the management and maintenance of your infrastructure and database server, including routine updates,backups and security. Build with the latest community edition of MySQL, including versions 5.6, 5.7 and 8.0.
     
-   - ![mysql server ss](images/mysqldb1.png)
+        ```
+            #command to deploy storage account
+        ```
     - Select the Create a resource button (+) in the upper left corner of the portal in resource group
     - Select Databases > Azure Database for MySQL. If you cannot find MySQL Server under the Databases category, click See all to show all available database services. You can also type Azure Database for MySQL in the search box to quickly find the service. 
     - Click Azure Database for MySQL. Fill out the Azure Database for MySQL form. 
@@ -208,7 +234,7 @@ Moodle Migration involves following steps,
         
           ![putty keygen ss 1](images/puttykeygen2.png)
         -  The public and private key is generated.
-    -  Create a VM with ubuntu 16.04 / 18.04 operating system with SSH public key 
+    -  Create a VM with ubuntu 16.04 operating system with SSH public key 
     -  Select the default subscription and same resource group and give name for virtual machine. 
     -  Give the default region group. 
     -  Keep the availability options as default. 
@@ -230,6 +256,9 @@ Moodle Migration involves following steps,
     
       ![Create a VM Screenshot 4](images/vm6.png)
     -   Keeping the other parameters as default Click on review and create.
+        ```
+            #command to create Virtual machine
+        ```
     -   Login into this controller machine using any of the free open-source terminal emulator or serial console tools.
     -   Copy the public IP of controller VM and paste as host name and expand SSH in navigation panel and click on Auth and browse the same SSH key file given while deployment. Click on Open and it will prompt to give the username as azureadmin same as given while deployment that is azureadmin 
     
